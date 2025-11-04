@@ -3,73 +3,42 @@
 <head>
     <title>Docker Container</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 50px;
-            text-align: center;
-        }
-        button {
+        body { font-family: Arial; margin: 50px; text-align: center; }
+        .button {
+            display: inline-block;
             padding: 15px 30px;
             font-size: 16px;
             background: #007cba;
             color: white;
-            border: none;
+            text-decoration: none;
             border-radius: 5px;
             cursor: pointer;
         }
-        button:hover { background: #005a87; }
-        button:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-        #status {
-            margin: 20px;
-            padding: 10px;
-            border-radius: 5px;
-        }
+        .button:hover { background: #005a87; }
+        #status { margin: 20px; padding: 10px; border-radius: 5px; }
         .success { background: #d4edda; color: #155724; }
-        .error { background: #f8d7da; color: #721c24; }
     </style>
 </head>
 <body>
 <h2>Create PostgreSQL Container</h2>
-<button onclick="createContainer()">Create Container</button>
+
+<!-- Простая ссылка, которая откроет создание контейнера -->
+<a href="http://89.223.123.126:8080/api/docker/containers/create?containerName=pg_autoport"
+   target="_blank" class="button">
+    Create Container
+</a>
+
 <div id="status"></div>
 
 <script>
-    const SERVER_URL = 'http://89.223.123.126:8080';
+    // Можно добавить отслеживание открытого окна
+    const link = document.querySelector('a');
+    const status = document.getElementById('status');
 
-    async function createContainer() {
-        const button = document.querySelector('button');
-        const status = document.getElementById('status');
-
-        button.disabled = true;
-        button.textContent = 'Creating...';
-        status.textContent = 'Creating container...';
-        status.className = '';
-
-        try {
-            // Теперь используем GET запрос с параметром в URL
-            const response = await fetch(`${SERVER_URL}/api/docker/containers/create?containerName=pg_autoport`);
-
-            const data = await response.json();
-
-            if (response.ok) {
-                status.textContent = `Success: ${data.message}`;
-                status.className = 'success';
-            } else {
-                status.textContent = `Error: ${data.details || data.error}`;
-                status.className = 'error';
-            }
-
-        } catch (error) {
-            status.textContent = `Network Error: ${error.message}`;
-            status.className = 'error';
-        }
-
-        button.disabled = false;
-        button.textContent = 'Create Container';
-    }
+    link.addEventListener('click', function() {
+        status.textContent = 'Открывается создание контейнера в новом окне...';
+        status.className = 'success';
+    });
 </script>
 </body>
 </html>
