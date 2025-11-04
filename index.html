@@ -1,103 +1,52 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Docker Container Manager</title>
+    <title>Docker Container</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
+            margin: 50px;
             text-align: center;
         }
-
-        .container {
-            background: #f5f5f5;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
         button {
+            padding: 15px 30px;
+            font-size: 16px;
             background: #007cba;
             color: white;
             border: none;
-            padding: 15px 30px;
-            font-size: 18px;
             border-radius: 5px;
             cursor: pointer;
-            margin: 10px;
         }
-
-        button:hover {
-            background: #005a87;
-        }
-
+        button:hover { background: #005a87; }
         button:disabled {
-            background: #cccccc;
+            background: #ccc;
             cursor: not-allowed;
         }
-
-        .status {
-            margin-top: 20px;
+        #status {
+            margin: 20px;
             padding: 10px;
             border-radius: 5px;
-            display: none;
         }
-
-        .success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .loading {
-            color: #856404;
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
     </style>
 </head>
 <body>
-<div class="container">
-    <h1>🐳 Docker Container Manager</h1>
-    <p>Создайте новый контейнер PostgreSQL с автоматическим портом</p>
-
-    <button id="createBtn" onclick="createContainer()">
-        🚀 Создать контейнер PostgreSQL
-    </button>
-
-    <div id="status" class="status"></div>
-
-    <div style="margin-top: 20px; font-size: 14px; color: #666;">
-        <p>Будет создан контейнер с именем <strong>pg_autoport</strong></p>
-        <p>Используется образ <strong>db_pg</strong></p>
-        <p>Порт будет выбран автоматически (54321, 54322, ...)</p>
-    </div>
-</div>
+<h2>Create PostgreSQL Container</h2>
+<button onclick="createContainer()">Create Container</button>
+<div id="status"></div>
 
 <script>
-    // Замените этот URL на ваш реальный URL сервера
     const SERVER_URL = 'http://89.223.123.126:8080';
 
     async function createContainer() {
-        const button = document.getElementById('createBtn');
+        const button = document.querySelector('button');
         const status = document.getElementById('status');
 
-        // Показываем загрузку
         button.disabled = true;
-        button.innerHTML = '⏳ Создание контейнера...';
-        status.style.display = 'block';
-        status.className = 'status loading';
-        status.innerHTML = 'Создаем контейнер PostgreSQL...';
+        button.textContent = 'Creating...';
+        status.textContent = 'Creating container...';
+        status.className = '';
 
         try {
             const response = await fetch(`${SERVER_URL}/api/docker/containers`, {
@@ -113,58 +62,201 @@
             const data = await response.json();
 
             if (response.ok) {
-                // Успех
-                status.className = 'status success';
-                status.innerHTML = `
-                        <h3>✅ Контейнер успешно создан!</h3>
-                        <p><strong>Сообщение:</strong> ${data.message}</p>
-                        <p><small>ID контейнера и порт указаны в сообщении выше</small></p>
-                    `;
-
-                // Возвращаем кнопку в исходное состояние через 3 секунды
-                setTimeout(() => {
-                    button.disabled = false;
-                    button.innerHTML = '🚀 Создать контейнер PostgreSQL';
-                }, 3000);
-
+                status.textContent = `Success: ${data.message}`;
+                status.className = 'success';
             } else {
-                // Ошибка
-                throw new Error(data.details || data.error || 'Неизвестная ошибка');
+                status.textContent = `Error: ${data.details || data.error}`;
+                status.className = 'error';
             }
 
         } catch (error) {
-            // Ошибка сети или сервера
-            status.className = 'status error';
-            status.innerHTML = `
-                    <h3>❌ Ошибка!</h3>
-                    <p><strong>Причина:</strong> ${error.message}</p>
-                    <p><small>Проверьте что сервер запущен и доступен</small></p>
-                `;
-
-            // Восстанавливаем кнопку
-            button.disabled = false;
-            button.innerHTML = '🚀 Создать контейнер PostgreSQL';
+            status.textContent = `Network Error: ${error.message}`;
+            status.className = 'error';
         }
+
+        button.disabled = false;
+        button.textContent = 'Create Container';
     }
-
-    // Проверка подключения к серверу при загрузке страницы
-    window.addEventListener('load', async () => {
-        try {
-            const response = await fetch(`${SERVER_URL}/api/docker/containers`);
-            if (!response.ok) {
-                throw new Error('Сервер недоступен');
-            }
-        } catch (error) {
-            const status = document.getElementById('status');
-            status.style.display = 'block';
-            status.className = 'status error';
-            status.innerHTML = `
-                    <h3>⚠️ Внимание</h3>
-                    <p>Сервер недоступен: ${SERVER_URL}</p>
-                    <p><small>Проверьте подключение и настройки сервера</small></p>
-                `;
-        }
-    });
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="ru">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Docker Container Manager</title>-->
+<!--    <style>-->
+<!--        body {-->
+<!--            font-family: Arial, sans-serif;-->
+<!--            max-width: 600px;-->
+<!--            margin: 50px auto;-->
+<!--            padding: 20px;-->
+<!--            text-align: center;-->
+<!--        }-->
+
+<!--        .container {-->
+<!--            background: #f5f5f5;-->
+<!--            padding: 30px;-->
+<!--            border-radius: 10px;-->
+<!--            box-shadow: 0 2px 10px rgba(0,0,0,0.1);-->
+<!--        }-->
+
+<!--        button {-->
+<!--            background: #007cba;-->
+<!--            color: white;-->
+<!--            border: none;-->
+<!--            padding: 15px 30px;-->
+<!--            font-size: 18px;-->
+<!--            border-radius: 5px;-->
+<!--            cursor: pointer;-->
+<!--            margin: 10px;-->
+<!--        }-->
+
+<!--        button:hover {-->
+<!--            background: #005a87;-->
+<!--        }-->
+
+<!--        button:disabled {-->
+<!--            background: #cccccc;-->
+<!--            cursor: not-allowed;-->
+<!--        }-->
+
+<!--        .status {-->
+<!--            margin-top: 20px;-->
+<!--            padding: 10px;-->
+<!--            border-radius: 5px;-->
+<!--            display: none;-->
+<!--        }-->
+
+<!--        .success {-->
+<!--            background: #d4edda;-->
+<!--            color: #155724;-->
+<!--            border: 1px solid #c3e6cb;-->
+<!--        }-->
+
+<!--        .error {-->
+<!--            background: #f8d7da;-->
+<!--            color: #721c24;-->
+<!--            border: 1px solid #f5c6cb;-->
+<!--        }-->
+
+<!--        .loading {-->
+<!--            color: #856404;-->
+<!--            background: #fff3cd;-->
+<!--            border: 1px solid #ffeaa7;-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<div class="container">-->
+<!--    <h1>🐳 Docker Container Manager</h1>-->
+<!--    <p>Создайте новый контейнер PostgreSQL с автоматическим портом</p>-->
+
+<!--    <button id="createBtn" onclick="createContainer()">-->
+<!--        🚀 Создать контейнер PostgreSQL-->
+<!--    </button>-->
+
+<!--    <div id="status" class="status"></div>-->
+
+<!--    <div style="margin-top: 20px; font-size: 14px; color: #666;">-->
+<!--        <p>Будет создан контейнер с именем <strong>pg_autoport</strong></p>-->
+<!--        <p>Используется образ <strong>db_pg</strong></p>-->
+<!--        <p>Порт будет выбран автоматически (54321, 54322, ...)</p>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!--<script>-->
+<!--    // Замените этот URL на ваш реальный URL сервера-->
+<!--    const SERVER_URL = 'http://89.223.123.126:8080';-->
+
+<!--    async function createContainer() {-->
+<!--        const button = document.getElementById('createBtn');-->
+<!--        const status = document.getElementById('status');-->
+
+<!--        // Показываем загрузку-->
+<!--        button.disabled = true;-->
+<!--        button.innerHTML = '⏳ Создание контейнера...';-->
+<!--        status.style.display = 'block';-->
+<!--        status.className = 'status loading';-->
+<!--        status.innerHTML = 'Создаем контейнер PostgreSQL...';-->
+
+<!--        try {-->
+<!--            const response = await fetch(`${SERVER_URL}/api/docker/containers`, {-->
+<!--                method: 'POST',-->
+<!--                headers: {-->
+<!--                    'Content-Type': 'application/json',-->
+<!--                },-->
+<!--                body: JSON.stringify({-->
+<!--                    containerName: 'pg_autoport'-->
+<!--                })-->
+<!--            });-->
+
+<!--            const data = await response.json();-->
+
+<!--            if (response.ok) {-->
+<!--                // Успех-->
+<!--                status.className = 'status success';-->
+<!--                status.innerHTML = `-->
+<!--                        <h3>✅ Контейнер успешно создан!</h3>-->
+<!--                        <p><strong>Сообщение:</strong> ${data.message}</p>-->
+<!--                        <p><small>ID контейнера и порт указаны в сообщении выше</small></p>-->
+<!--                    `;-->
+
+<!--                // Возвращаем кнопку в исходное состояние через 3 секунды-->
+<!--                setTimeout(() => {-->
+<!--                    button.disabled = false;-->
+<!--                    button.innerHTML = '🚀 Создать контейнер PostgreSQL';-->
+<!--                }, 3000);-->
+
+<!--            } else {-->
+<!--                // Ошибка-->
+<!--                throw new Error(data.details || data.error || 'Неизвестная ошибка');-->
+<!--            }-->
+
+<!--        } catch (error) {-->
+<!--            // Ошибка сети или сервера-->
+<!--            status.className = 'status error';-->
+<!--            status.innerHTML = `-->
+<!--                    <h3>❌ Ошибка!</h3>-->
+<!--                    <p><strong>Причина:</strong> ${error.message}</p>-->
+<!--                    <p><small>Проверьте что сервер запущен и доступен</small></p>-->
+<!--                `;-->
+
+<!--            // Восстанавливаем кнопку-->
+<!--            button.disabled = false;-->
+<!--            button.innerHTML = '🚀 Создать контейнер PostgreSQL';-->
+<!--        }-->
+<!--    }-->
+
+<!--    // Проверка подключения к серверу при загрузке страницы-->
+<!--    window.addEventListener('load', async () => {-->
+<!--        try {-->
+<!--            const response = await fetch(`${SERVER_URL}/api/docker/containers`);-->
+<!--            if (!response.ok) {-->
+<!--                throw new Error('Сервер недоступен');-->
+<!--            }-->
+<!--        } catch (error) {-->
+<!--            const status = document.getElementById('status');-->
+<!--            status.style.display = 'block';-->
+<!--            status.className = 'status error';-->
+<!--            status.innerHTML = `-->
+<!--                    <h3>⚠️ Внимание</h3>-->
+<!--                    <p>Сервер недоступен: ${SERVER_URL}</p>-->
+<!--                    <p><small>Проверьте подключение и настройки сервера</small></p>-->
+<!--                `;-->
+<!--        }-->
+<!--    });-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->
