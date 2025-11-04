@@ -3,42 +3,110 @@
 <head>
     <title>Docker Container</title>
     <style>
-        body { font-family: Arial; margin: 50px; text-align: center; }
-        .button {
-            display: inline-block;
+        body {
+            font-family: Arial;
+            margin: 50px;
+            text-align: center;
+        }
+        button {
             padding: 15px 30px;
             font-size: 16px;
             background: #007cba;
             color: white;
-            text-decoration: none;
+            border: none;
             border-radius: 5px;
             cursor: pointer;
         }
-        .button:hover { background: #005a87; }
-        #status { margin: 20px; padding: 10px; border-radius: 5px; }
-        .success { background: #d4edda; color: #155724; }
+        button:hover {
+            background: #005a87;
+        }
+        #resultFrame {
+            width: 90%;
+            height: 200px;
+            border: 2px solid #007cba;
+            border-radius: 5px;
+            margin: 20px auto;
+            background: #f8f9fa;
+        }
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
 <h2>Create PostgreSQL Container</h2>
 
-<!-- Простая ссылка, которая откроет создание контейнера -->
-<a href="http://89.223.123.126:8080/api/docker/containers/create?containerName=pg_autoport"
-   target="_blank" class="button">
-    Create Container
-</a>
+<button onclick="createContainer()">Create Container</button>
 
-<div id="status"></div>
+<iframe id="resultFrame" src="about:blank"></iframe>
 
 <script>
-    // Можно добавить отслеживание открытого окна
-    const link = document.querySelector('a');
-    const status = document.getElementById('status');
+    function createContainer() {
+        const frame = document.getElementById('resultFrame');
 
-    link.addEventListener('click', function() {
-        status.textContent = 'Открывается создание контейнера в новом окне...';
-        status.className = 'success';
-    });
+        // Показываем сообщение о загрузке
+        frame.srcdoc = `
+                <html>
+                    <body class="loading">
+                        <div>Creating container pg_autoport...</div>
+                    </body>
+                </html>
+            `;
+
+        // Загружаем создание контейнера
+        frame.src = 'http://89.223.123.126:8080/api/docker/containers/create?containerName=pg_autoport';
+    }
 </script>
 </body>
 </html>
+
+
+
+<!--<!DOCTYPE html>-->
+<!--<html>-->
+<!--<head>-->
+<!--    <title>Docker Container</title>-->
+<!--    <style>-->
+<!--        body { font-family: Arial; margin: 50px; text-align: center; }-->
+<!--        .button {-->
+<!--            display: inline-block;-->
+<!--            padding: 15px 30px;-->
+<!--            font-size: 16px;-->
+<!--            background: #007cba;-->
+<!--            color: white;-->
+<!--            text-decoration: none;-->
+<!--            border-radius: 5px;-->
+<!--            cursor: pointer;-->
+<!--        }-->
+<!--        .button:hover { background: #005a87; }-->
+<!--        #status { margin: 20px; padding: 10px; border-radius: 5px; }-->
+<!--        .success { background: #d4edda; color: #155724; }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<h2>Create PostgreSQL Container</h2>-->
+
+<!--&lt;!&ndash; Простая ссылка, которая откроет создание контейнера &ndash;&gt;-->
+<!--<a href="http://89.223.123.126:8080/api/docker/containers/create?containerName=pg_autoport"-->
+<!--   target="_blank" class="button">-->
+<!--    Create Container-->
+<!--</a>-->
+
+<!--<div id="status"></div>-->
+
+<!--<script>-->
+<!--    // Можно добавить отслеживание открытого окна-->
+<!--    const link = document.querySelector('a');-->
+<!--    const status = document.getElementById('status');-->
+
+<!--    link.addEventListener('click', function() {-->
+<!--        status.textContent = 'Открывается создание контейнера в новом окне...';-->
+<!--        status.className = 'success';-->
+<!--    });-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->
