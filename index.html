@@ -20,20 +20,29 @@
         button:hover {
             background: #005a87;
         }
-        #resultFrame {
+        #result {
             width: 90%;
-            height: 200px;
+            min-height: 100px;
             border: 2px solid #007cba;
             border-radius: 5px;
             margin: 20px auto;
+            padding: 20px;
             background: #f8f9fa;
+            text-align: left;
+            white-space: pre-wrap;
+            font-family: monospace;
         }
         .loading {
-            display: flex;
-            align-items: center;
-            justify-content: center;
             color: #666;
             font-style: italic;
+        }
+        .success {
+            color: #155724;
+            background: #d4edda;
+        }
+        .error {
+            color: #721c24;
+            background: #f8d7da;
         }
     </style>
 </head>
@@ -42,23 +51,46 @@
 
 <button onclick="createContainer()">Create Container</button>
 
-<iframe id="resultFrame" src="about:blank"></iframe>
+<div id="result"></div>
 
 <script>
-    function createContainer() {
-        const frame = document.getElementById('resultFrame');
+    async function createContainer() {
+        const resultDiv = document.getElementById('result');
 
         // Показываем сообщение о загрузке
-        frame.srcdoc = `
-                <html>
-                    <body class="loading">
-                        <div>Creating container pg_autoport...</div>
-                    </body>
-                </html>
-            `;
+        resultDiv.className = 'loading';
+        resultDiv.textContent = 'Creating container pg_autoport...';
 
-        // Загружаем создание контейнера
-        frame.src = 'http://89.223.123.126:8080/api/docker/containers/create?containerName=pg_autoport';
+        try {
+            // Используем CORS proxy для обхода блокировки
+            const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+            const targetUrl = 'http://89.223.123.126:8080/api/docker/containers/create?containerName=pg_autoport';
+
+            const response = await fetch(proxyUrl + targetUrl, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            resultDiv.className = 'success';
+            resultDiv.textContent = `✅ Success!\n\n${JSON.stringify(data, null, 2)}`;
+
+        } catch (error) {
+            resultDiv.className = 'error';
+            resultDiv.textContent = `❌ Error: ${error.message}\n\nTrying alternative method...`;
+
+            // Альтернативный метод - открыть в новом окне
+            setTimeout(() => {
+                window.open('http://89.223.123.126:8080/api/docker/containers/create?containerName=pg_autoport', '_blank');
+            }, 1000);
+        }
     }
 </script>
 </body>
